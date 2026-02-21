@@ -1,5 +1,10 @@
 # Briefankündigung für Home Assistant
 
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?logo=homeassistant&logoColor=fff)](https://hacs.xyz)
+[![GitHub Release](https://img.shields.io/github/v/release/Huskynarr/hacs-post?display_name=tag&sort=semver)](https://github.com/Huskynarr/hacs-post/releases)
+[![Validate](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml/badge.svg)](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml)
+[![License](https://img.shields.io/github/license/Huskynarr/hacs-post)](https://github.com/Huskynarr/hacs-post/blob/main/LICENSE)
+
 Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E-Mail-Postfach per IMAP auf neue "Briefankündigung"-E-Mails der Deutschen Post überprüft.
 
 ## Funktionen
@@ -12,8 +17,10 @@ Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E
 
 ### Über HACS (Empfohlen)
 
-1.  Fügen Sie dieses Repository als "Benutzerdefiniertes Repository" in HACS hinzu.
-2.  Suchen Sie nach "Briefankündigung" und installieren Sie es.
+[![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Huskynarr&repository=hacs-post&category=integration)
+
+1.  Klicken Sie auf den Button und bestätigen Sie das Repository in HACS.
+2.  Installieren Sie die Integration.
 3.  Starten Sie Home Assistant neu.
 
 ### Manuell
