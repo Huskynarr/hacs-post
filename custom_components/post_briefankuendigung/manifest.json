@@ -4,8 +4,8 @@
   "codeowners": ["@huskynarr"],
   "config_flow": true,
   "documentation": "https://github.com/huskynarr/hacs-post/blob/main/README.md",
-  "issue_tracker": "https://github.com/huskynarr/hacs-post/issues",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/huskynarr/hacs-post/issues",
   "requirements": [],
   "version": "1.0.2"
 }
