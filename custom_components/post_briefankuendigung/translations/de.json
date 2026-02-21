@@ -3,15 +3,15 @@
     "step": {
       "user": {
         "title": "Briefankündigung Einrichten",
-        "description": "Konfigurieren Sie Ihre IMAP-Verbindung, um Briefankündigungen abzurufen.",
+        "description": "Konfigurieren Sie Ihre IMAP-Verbindung, um Briefankündigungen und optional Post & Paket abzurufen.",
         "data": {
           "host": "IMAP Server",
           "port": "Port",
           "username": "Benutzername",
           "password": "Passwort",
           "folder": "Ordner (z.B. INBOX)",
-          "sender": "Absender E-Mail",
-          "subject": "Betreff Schlüsselwort"
+          "sender": "Absender E-Mail(s), mit Komma trennen",
+          "subject": "Betreff-Schlüsselwörter, mit Komma trennen"
         }
       }
     },
@@ -22,6 +22,28 @@
     },
     "abort": {
       "already_configured": "Dieses Konto ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Briefankündigung konfigurieren",
+        "description": "Passe die IMAP-Verbindung und Filter direkt in der UI an.",
+        "data": {
+          "host": "IMAP Server",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "folder": "Ordner (z.B. INBOX)",
+          "sender": "Absender E-Mail(s), mit Komma trennen",
+          "subject": "Betreff-Schlüsselwörter, mit Komma trennen"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum IMAP-Server fehlgeschlagen.",
+      "invalid_auth": "Benutzername oder Passwort ungültig.",
+      "unknown": "Unerwarteter Fehler."
     }
   }
 }

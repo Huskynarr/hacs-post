@@ -5,11 +5,11 @@
 [![Validate](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml/badge.svg)](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml)
 [![License](https://img.shields.io/github/license/Huskynarr/hacs-post)](https://github.com/Huskynarr/hacs-post/blob/main/LICENSE)
 
-Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E-Mail-Postfach per IMAP auf neue "Briefankündigung"-E-Mails der Deutschen Post überprüft.
+Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E-Mail-Postfach per IMAP auf neue Briefankündigungs- und optional Post-&-Paket-E-Mails überprüft.
 
 ## Funktionen
 
--   **Sensor:** Zeigt die Anzahl der heutigen Briefankündigungen an.
+-   **Sensor:** Zeigt die Anzahl der heutigen Treffer an (z. B. Briefankündigung, Post & Paket).
 -   **Attribute:** Listet die Betreffzeilen der gefundenen E-Mails auf.
 -   **Konfiguration:** Einfache Einrichtung über die Home Assistant Benutzeroberfläche (Config Flow).
 
@@ -39,8 +39,15 @@ Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E
     -   **Benutzername**: Ihre E-Mail-Adresse
     -   **Passwort**: Ihr E-Mail-Passwort (bei Gmail/GMX/Web.de ggf. App-Passwort verwenden!)
     -   **Ordner**: `INBOX` (oder wo die Briefankündigungen landen)
-    -   **Absender**: Die E-Mail-Adresse, von der die Ankündigungen kommen (Standard: `noreply@deutschepost.de`)
-    -   **Betreff**: Ein Schlüsselwort, nach dem im Betreff gesucht werden soll (Standard: `Briefankündigung`)
+    -   **Absender**: Eine oder mehrere Absenderadressen (mit Komma trennen), Standard: `noreply@deutschepost.de`
+    -   **Betreff**: Ein oder mehrere Schlüsselwörter (mit Komma trennen), Standard: `Briefankündigung, Post & Paket`
+
+### Konfiguration später ändern (UI)
+
+1.  Gehen Sie zu **Einstellungen** > **Geräte & Dienste**.
+2.  Öffnen Sie die Integration **Briefankündigung**.
+3.  Klicken Sie auf **Konfigurieren** und passen Sie die Werte an.
+4.  Die Integration wird nach dem Speichern automatisch neu geladen.
 
 ## Hinweise
 

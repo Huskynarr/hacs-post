@@ -1,9 +1,12 @@
 """Sensor platform for Briefankündigung."""
+from __future__ import annotations
+
 import logging
 import imaplib
 import email
 from email.header import decode_header
 import datetime
+from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import (
@@ -17,30 +20,34 @@ from .const import (
     CONF_FOLDER,
     CONF_SENDER,
     CONF_SUBJECT,
+    DOMAIN,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = datetime.timedelta(minutes=15)
 
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensor platform."""
-    config = config_entry.data
-    async_add_entities([BriefankuendigungSensor(config)], True)
+    config = hass.data[DOMAIN].get(config_entry.entry_id)
+    if config is None:
+        config = dict(config_entry.data)
+        config.update(config_entry.options)
+    async_add_entities([BriefankuendigungSensor(config, config_entry.entry_id)], True)
+
 
 class BriefankuendigungSensor(SensorEntity):
     """Representation of a Briefankündigung Sensor."""
 
-    def __init__(self, config):
+    def __init__(self, config: dict[str, Any], entry_id: str):
         """Initialize the sensor."""
         self._config = config
         self._state = 0
         self._attributes = {}
         self._attr_available = True
         self._attr_name = "Briefankündigung"
-        self._attr_unique_id = (
-            f"{config[CONF_HOST]}:{config[CONF_USERNAME]}:{config[CONF_FOLDER]}:briefankuendigung"
-        ).lower()
+        self._attr_unique_id = f"{entry_id}_briefankuendigung"
         self._attr_icon = "mdi:email-outline"
 
     @property
@@ -66,21 +73,21 @@ class BriefankuendigungSensor(SensorEntity):
             months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
             today = datetime.date.today()
             date_str = f"{today.day}-{months[today.month-1]}-{today.year}"
-            
-            sender = self._config.get(CONF_SENDER)
-            target_subject = self._config.get(CONF_SUBJECT)
 
-            # Search for emails from today and sender
-            # Note: We filter by subject in Python to avoid IMAP charset issues
-            criteria = f'(SINCE "{date_str}" FROM "{sender}")'
-            
+            sender_filters = _split_filter_values(self._config.get(CONF_SENDER))
+            subject_filters = _split_filter_values(self._config.get(CONF_SUBJECT))
+
+            # Search all messages since today and filter sender/subject in Python.
+            # This supports multiple sender/subject keywords without IMAP charset issues.
+            criteria = f'(SINCE "{date_str}")'
+
             typ, data = mail.search(None, criteria)
 
             if typ != "OK":
                 raise RuntimeError("Error searching emails")
 
             email_ids = data[0].split()
-            
+
             match_count = 0
             subjects = []
 
@@ -89,20 +96,13 @@ class BriefankuendigungSensor(SensorEntity):
                 for response_part in msg_data:
                     if isinstance(response_part, tuple):
                         msg = email.message_from_bytes(response_part[1])
-                        subject_header = msg["Subject"]
-                        if subject_header:
-                            decoded_list = decode_header(subject_header)
-                            subject = ""
-                            for text, encoding in decoded_list:
-                                if isinstance(text, bytes):
-                                    subject += text.decode(encoding if encoding else "utf-8", errors="replace")
-                                else:
-                                    subject += str(text)
-                        else:
-                            subject = "No Subject"
+                        sender = _decode_mime_header(msg.get("From", ""))
+                        subject = _decode_mime_header(msg.get("Subject", "No Subject"))
 
-                        # Filter by subject if configured
-                        if target_subject and target_subject.lower() not in subject.lower():
+                        if sender_filters and not _contains_any(sender, sender_filters):
+                            continue
+
+                        if subject_filters and not _contains_any(subject, subject_filters):
                             continue
 
                         match_count += 1
@@ -110,6 +110,8 @@ class BriefankuendigungSensor(SensorEntity):
 
             self._state = match_count
             self._attributes["subjects"] = subjects
+            self._attributes["applied_sender_filters"] = sender_filters
+            self._attributes["applied_subject_filters"] = subject_filters
             self._attributes["last_updated"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
             self._attr_available = True
 
@@ -130,3 +132,30 @@ class BriefankuendigungSensor(SensorEntity):
                     mail.logout()
                 except Exception as err:
                     _LOGGER.debug("Error logging out from IMAP: %s", err)
+
+
+def _split_filter_values(value: str | None) -> list[str]:
+    """Split a user filter string into values (comma, semicolon or newline separated)."""
+    if not value:
+        return []
+
+    normalized = value.replace(";", ",").replace("\n", ",")
+    return [item.strip() for item in normalized.split(",") if item.strip()]
+
+
+def _contains_any(text: str, filters: list[str]) -> bool:
+    """Return True if text contains at least one filter value."""
+    normalized = text.lower()
+    return any(item.lower() in normalized for item in filters)
+
+
+def _decode_mime_header(header_value: str) -> str:
+    """Decode MIME encoded header values into a readable string."""
+    decoded_list = decode_header(header_value)
+    decoded = ""
+    for text, encoding in decoded_list:
+        if isinstance(text, bytes):
+            decoded += text.decode(encoding if encoding else "utf-8", errors="replace")
+        else:
+            decoded += str(text)
+    return decoded

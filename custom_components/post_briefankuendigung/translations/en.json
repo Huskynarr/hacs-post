@@ -3,15 +3,15 @@
     "step": {
       "user": {
         "title": "Briefankündigung Setup",
-        "description": "Configure your IMAP connection to check for letter notifications.",
+        "description": "Configure your IMAP connection to check for letter notifications and optionally Post & Paket.",
         "data": {
           "host": "IMAP Server",
           "port": "Port",
           "username": "Username",
           "password": "Password",
           "folder": "Folder (e.g., INBOX)",
-          "sender": "Sender Email",
-          "subject": "Subject Keyword"
+          "sender": "Sender email(s), comma separated",
+          "subject": "Subject keywords, comma separated"
         }
       }
     },
@@ -22,6 +22,28 @@
     },
     "abort": {
       "already_configured": "This account is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Briefankündigung",
+        "description": "Adjust IMAP connection and filters directly in the UI.",
+        "data": {
+          "host": "IMAP Server",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "folder": "Folder (e.g., INBOX)",
+          "sender": "Sender email(s), comma separated",
+          "subject": "Subject keywords, comma separated"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to IMAP server.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error."
     }
   }
 }
