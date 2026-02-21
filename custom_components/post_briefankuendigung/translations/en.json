@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Briefankündigung Setup",
+        "description": "Configure your IMAP connection to check for letter notifications.",
+        "data": {
+          "host": "IMAP Server",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "folder": "Folder (e.g., INBOX)",
+          "sender": "Sender Email",
+          "subject": "Subject Keyword"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to IMAP server.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This account is already configured."
+    }
+  }
+}
