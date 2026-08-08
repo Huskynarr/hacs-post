@@ -1,60 +1,174 @@
-# Briefankündigung für Home Assistant
+# DHL & Deutsche Post Integration for Home Assistant
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?logo=homeassistant&logoColor=fff)](https://hacs.xyz)
-[![GitHub Release](https://img.shields.io/github/v/release/Huskynarr/hacs-post?display_name=tag&sort=semver)](https://github.com/Huskynarr/hacs-post/releases)
-[![Validate](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml/badge.svg)](https://github.com/Huskynarr/hacs-post/actions/workflows/validate.yml)
-[![License](https://img.shields.io/github/license/Huskynarr/hacs-post)](https://github.com/Huskynarr/hacs-post/blob/main/LICENSE)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/huskynarr/hacs-post.svg)](https://github.com/huskynarr/hacs-post/releases)
+[![GitHub Actions](https://github.com/huskynarr/hacs-post/workflows/CI/badge.svg)](https://github.com/huskynarr/hacs-post/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/github/huskynarr/hacs-post.svg)](https://codecov.io/gh/huskynarr/hacs-post)
 
-Ein benutzerdefiniertes Home Assistant-Integration (Custom Component), das Ihr E-Mail-Postfach per IMAP auf neue Briefankündigungs- und optional Post-&-Paket-E-Mails überprüft.
+A **Home Assistant Custom Integration** for tracking **DHL Paket Deutschland** shipments and **Deutsche Post Briefankündigungen** (mail announcements).
 
-## Funktionen
+## ✨ Features
 
--   **Sensor:** Zeigt die Anzahl der heutigen Treffer an (z. B. Briefankündigung, Post & Paket).
--   **Attribute:** Listet die Betreffzeilen der gefundenen E-Mails auf.
--   **Konfiguration:** Einfache Einrichtung über die Home Assistant Benutzeroberfläche (Config Flow).
+### 📦 Package Tracking (DHL Paket DE)
+- **Official API** — Uses DHL Parcel DE Tracking API (Unified Tracking API)
+- **Authentication** — API Key via DHL Developer Portal (Sandbox & Production)
+- **Real-time tracking** — Status, history, estimated delivery, delivery window
+- **Multiple parcels** — Track up to 15 tracking numbers per request
+- **Rich sensors** — Per-parcel sensors with full details as attributes
+- **Lifecycle management** — Automatic sensor creation/removal
+- **Events** — `dhl_de_parcel_discovered`, `dhl_de_parcel_status_changed`, `dhl_de_parcel_delivered`
 
-## Installation
+### 📬 Briefankündigung (Deutsche Post)
+- **Email-based** — Parses emails from `ankuendigung@brief.deutschepost.de`
+- **IMAP support** — Works with GMX, WEB.DE, or any IMAP provider
+- **Mail images** — Extracts base64 inline images from emails
+- **Camera entity** — Animated GIF of today's mail (like USPS Informed Delivery)
+- **Daily summary** — Count of announced letters per day
+- **Multi-account** — Support for multiple email accounts
 
-### Über HACS (Empfohlen)
+### 🏪 Packstation
+- **Automatic detection** — Recognizes Packstation deliveries from tracking data
+- **Pickup notifications** — Alerts when parcel ready for pickup
+- **Locker info** — Shows Packstation location and compartment when available
 
-[![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Huskynarr&repository=hacs-post&category=integration)
+## 🚀 Installation
 
-1.  Klicken Sie auf den Button und bestätigen Sie das Repository in HACS.
-2.  Installieren Sie die Integration.
-3.  Starten Sie Home Assistant neu.
+### Via HACS (Recommended)
+1. Open HACS → **Integrations** → ⋮ → **Custom repositories**
+2. Add repository URL: `https://github.com/huskynarr/hacs-post`
+3. Category: **Integration**
+4. Click **Add**, then search for **DHL & Deutsche Post** and **Download**
+5. Restart Home Assistant
+6. Go to **Settings → Devices & Services → Add Integration** → Search **DHL & Deutsche Post**
 
-### Manuell
+### Manual
+1. Copy `custom_components/dhl_de` to your `config/custom_components/` directory
+2. Restart Home Assistant
+3. Add integration via UI
 
-1.  Kopieren Sie den Ordner `custom_components/post_briefankuendigung` in Ihren `custom_components`-Ordner in Home Assistant.
-2.  Starten Sie Home Assistant neu.
+## ⚙️ Configuration
 
-## Konfiguration
+The integration is configured entirely via the UI (**Settings → Devices & Services → Add Integration**).
 
-1.  Gehen Sie zu **Einstellungen** > **Geräte & Dienste**.
-2.  Klicken Sie auf **Integration hinzufügen**.
-3.  Suchen Sie nach **Briefankündigung**.
-4.  Geben Sie Ihre IMAP-Zugangsdaten ein:
-    -   **IMAP Server**: z.B. `imap.gmx.net` oder `imap.web.de`
-    -   **Port**: 993 (Standard für SSL)
-    -   **Benutzername**: Ihre E-Mail-Adresse
-    -   **Passwort**: Ihr E-Mail-Passwort (bei Gmail/GMX/Web.de ggf. App-Passwort verwenden!)
-    -   **Ordner**: `INBOX` (oder wo die Briefankündigungen landen)
-    -   **Absender**: Eine oder mehrere Absenderadressen (mit Komma trennen), Standard: `noreply@deutschepost.de`
-    -   **Betreff**: Ein oder mehrere Schlüsselwörter (mit Komma trennen), Standard: `Briefankündigung, Post & Paket`
+### Package Tracking Setup
+1. Get API Key from [DHL Developer Portal](https://developer.dhl.com/)
+   - Register → Create App → Select **Shipment Tracking - Unified** or **DHL Parcel DE Tracking**
+   - Copy **Consumer Key** (this is your API Key)
+2. In HA: Add Integration → **DHL & Deutsche Post** → **Package Tracking**
+3. Enter your **API Key** and optional **Recipient Postal Code** (for detailed address info)
+4. Choose **Environment**: Sandbox (free, no DHL account needed) or Production
 
-### Konfiguration später ändern (UI)
+### Briefankündigung Setup
+1. Ensure you have **Briefankündigung activated** at [deutschepost.de/briefankuendigung](https://www.deutschepost.de/briefankuendigung) (via GMX or WEB.DE)
+2. In HA: Add Integration → **DHL & Deutsche Post** → **Briefankündigung**
+3. Enter **IMAP server**, **email**, **password** (or app password)
+4. Configure **mail folder** (default: INBOX) and **scan interval**
 
-1.  Gehen Sie zu **Einstellungen** > **Geräte & Dienste**.
-2.  Öffnen Sie die Integration **Briefankündigung**.
-3.  Klicken Sie auf **Konfigurieren** und passen Sie die Werte an.
-4.  Die Integration wird nach dem Speichern automatisch neu geladen.
+## 📊 Entities
 
-## Hinweise
+### Package Tracking Sensors
+| Entity | Description |
+|--------|-------------|
+| `sensor.dhl_de_incoming_parcels` | Count of active incoming parcels |
+| `sensor.dhl_de_parcel_<tracking>` | Per-parcel sensor with full details |
+| `sensor.dhl_de_next_delivery` | Earliest expected delivery datetime |
+| `sensor.dhl_de_awaiting_pickup` | Parcels ready at Packstation/Postfiliale |
+| `sensor.dhl_de_delivered_parcels` | Recently delivered parcels (configurable window) |
+| `sensor.dhl_de_outgoing_parcels` | Active outgoing/return parcels |
+| `sensor.dhl_de_outgoing_delivered` | Delivered outgoing parcels |
 
--   Stellen Sie sicher, dass IMAP in Ihrem E-Mail-Konto aktiviert ist.
--   Bei vielen Anbietern (Gmail, GMX, Web.de) müssen Sie möglicherweise ein "App-spezifisches Passwort" erstellen, wenn Sie die Zwei-Faktor-Authentifizierung (2FA) nutzen.
--   Der Sensor aktualisiert sich standardmäßig alle 15 Minuten.
+### Briefankündigung Sensors
+| Entity | Description |
+|--------|-------------|
+| `sensor.dhl_de_mail_count` | Number of letters announced today |
+| `sensor.dhl_de_mail_<id>` | Per-letter sensor with sender/image |
+| `camera.dhl_de_mail_camera` | Animated GIF of today's mail images |
 
-## Lizenz
+### Parcel Attributes (Carrier-Agnostic Format)
+```json
+{
+  "carrier": "DHL",
+  "barcode": "00340434123456789012",
+  "sender": "Amazon EU S.à r.l.",
+  "receiver": "Max Mustermann",
+  "status": "IN_DELIVERY",
+  "raw_status": "Zustellung heute",
+  "delivered": false,
+  "delivered_at": null,
+  "planned_from": "2024-01-15T08:00:00+01:00",
+  "planned_to": "2024-01-15T18:00:00+01:00",
+  "pickup": true,
+  "pickup_point": "Packstation 123, 10115 Berlin",
+  "url": "https://www.dhl.de/.../00340434123456789012",
+  "weight": 1.2,
+  "dimensions": {"length": 30, "width": 20, "height": 10},
+  "history": [
+    {"timestamp": "2024-01-14T14:30:00+01:00", "status": "IN_TRANSIT", "raw_status": "Im Verteilerzentrum angekommen"},
+    {"timestamp": "2024-01-15T07:00:00+01:00", "status": "OUT_FOR_DELIVERY", "raw_status": "Zustellung heute"}
+  ]
+}
+```
 
-MIT
+## 🔧 Advanced Configuration
+
+### Options (via Integration Settings)
+- **Poll Interval** — How often to check for updates (default: 30 min)
+- **Delivered Filter** — Keep delivered parcels for N days or N most recent
+- **Parcel History** — Enable/disable status timeline in attributes
+- **Custom Image** — Custom "no mail" placeholder for Briefankündigung camera
+
+### Services
+| Service | Description |
+|---------|-------------|
+| `dhl_de.add_tracking` | Manually add a tracking number |
+| `dhl_de.remove_tracking` | Remove a tracking number |
+| `dhl_de.refresh` | Force immediate data refresh |
+
+## 🏗️ Architecture
+
+```
+custom_components/dhl_de/
+├── __init__.py              # Entry point, config entry setup
+├── config_flow.py           # UI configuration flows
+├── const.py                 # Constants, sensor definitions
+├── manifest.json            # Integration metadata
+├── hacs.json                # HACS manifest
+├── device.py                # Device info helpers
+├── api.py                   # DHL API client
+├── coordinator.py           # Data update coordinators
+├── sensor.py                # Sensor platforms
+├── camera.py                # Briefankündigung camera
+├── email_parser.py          # Briefankündigung email parsing
+├── strings.json             # UI strings
+├── translations/
+│   ├── en.json              # English translations
+│   └── de.json              # German translations
+├── shippers/
+│   └── post_de.py           # Deutsche Post Briefankündigung shipper
+└── tests/
+    ├── test_api.py
+    ├── test_coordinator.py
+    ├── test_email_parser.py
+    └── test_sensors.py
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- [ha-parcel-integrations](https://github.com/ha-parcel-integrations) for the excellent parcel integration patterns
+- [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) for Briefankündigung email parsing reference
+- DHL Developer Portal for API documentation
+
+## 💬 Support
+
+- **Issues**: [GitHub Issues](https://github.com/huskynarr/hacs-post/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/huskynarr/hacs-post/discussions)
+- **Wiki**: [Documentation Wiki](https://github.com/huskynarr/hacs-post/wiki)

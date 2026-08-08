@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Validate version consistency
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          MANIFEST_VERSION=$(cat custom_components/dhl_de/manifest.json | jq -r .version)
+          HACS_VERSION=$(cat custom_components/dhl_de/hacs.json | jq -r .version)
+          
+          if [ "$VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "Version mismatch: tag=$VERSION manifest=$MANIFEST_VERSION"
+            exit 1
+          fi
+          
+          if [ "$VERSION" != "$HACS_VERSION" ]; then
+            echo "Version mismatch: tag=$VERSION hacs=$HACS_VERSION"
+            exit 1
+          fi
+          
+          echo "Versions match: $VERSION"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^v$VERSION$" | head -1)
+          
+          if [ -z "$PREV_TAG" ]; then
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          
+          CHANGELOG=$(git log --pretty=format:"- %s (%an)" $PREV_TAG..HEAD)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## Installation
+            
+            ### HACS (Recommended)
+            1. Open HACS → Integrations → ⋮ → Custom repositories
+            2. Add `https://github.com/huskynarr/hacs-post` as Integration
+            3. Search for "DHL & Deutsche Post" and install
+            4. Restart Home Assistant
+            
+            ### Manual
+            Download `dhl_de.zip` from assets and extract to `config/custom_components/dhl_de`
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'rc') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') }}
+          files: |
+            custom_components/dhl_de/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create HACS package
+        run: |
+          cd custom_components
+          zip -r ../dhl_de.zip dhl_de/
+          cd ..
+          ls -la dhl_de.zip
+
+      - name: Upload HACS package
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: dhl_de.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify HACS
+        run: |
+          echo "Release created. HACS will pick up the new version automatically."
+          echo "Repository: https://github.com/huskynarr/hacs-post"

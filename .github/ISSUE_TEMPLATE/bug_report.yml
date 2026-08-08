@@ -1,0 +1,73 @@
+---
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+---
+
+## Bug Description
+
+A clear and concise description of what the bug is.
+
+## Environment
+
+- **Home Assistant Version**: (e.g., 2024.12.0)
+- **Integration Version**: (e.g., 1.2.3)
+- **Installation Method**: [ ] HACS [ ] Manual
+- **Python Version**: (e.g., 3.11.9)
+
+## Configuration
+
+**Which feature is affected?**
+- [ ] Package Tracking (DHL API)
+- [ ] Briefankündigung (Email/IMAP)
+- [ ] Both
+
+**Relevant configuration** (redact sensitive data):
+```yaml
+# Package Tracking
+api_key: "xxx"
+environment: "production"  # or sandbox
+postal_code: "10115"
+
+# Briefankündigung
+imap_server: "imap.gmx.net"
+email: "user@gmx.de"
+folder: "INBOX"
+```
+
+## Steps to Reproduce
+
+1. Step one
+2. Step two
+3. Step three
+
+## Expected Behavior
+
+What should happen?
+
+## Actual Behavior
+
+What actually happens?
+
+## Logs
+
+**Please include relevant logs** (set `logger: custom_components.dhl_de: debug`):
+
+```
+Paste logs here
+```
+
+## Additional Context
+
+- Screenshots (if applicable)
+- Network captures (if API related, redact credentials)
+- Any workarounds you've found
+
+## Checklist
+
+- [ ] I have searched existing issues
+- [ ] I am using the latest version
+- [ ] I have provided logs
+- [ ] I have redacted sensitive information

@@ -1,0 +1,190 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  PYTHON_VERSION: "3.11"
+  HA_VERSION: "2024.12.0"
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Check format
+        run: uv run ruff format --check .
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run mypy custom_components/dhl_de
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run tests
+        run: uv run pytest --cov=custom_components.dhl_de --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  hacs-validation:
+    name: HACS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: HACS Validation
+        uses: hacs/validation-action@v2
+        with:
+          category: integration
+          path: custom_components/dhl_de
+
+  manifest-validation:
+    name: Manifest Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install Home Assistant
+        run: uv pip install homeassistant==${{ env.HA_VERSION }}
+
+      - name: Validate manifest.json
+        run: |
+          python -c "
+import json
+import sys
+from pathlib import Path
+
+manifest_path = Path('custom_components/dhl_de/manifest.json')
+with open(manifest_path) as f:
+    manifest = json.load(f)
+
+required = ['domain', 'name', 'version', 'documentation', 'issue_tracker', 'requirements', 'config_flow', 'homekit']
+for field in required:
+    if field not in manifest:
+        print(f'Missing required field: {field}')
+        sys.exit(1)
+
+# Check version format
+import re
+version = manifest['version']
+if not re.match(r'^\d+\.\d+\.\d+$', version):
+    print(f'Invalid version format: {version} (expected semver)')
+    sys.exit(1)
+
+print('Manifest validation passed')
+print(f'Domain: {manifest[\"domain\"]}')
+print(f'Version: {manifest[\"version\"]}')
+"
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Install Home Assistant
+        run: uv pip install homeassistant==${{ env.HA_VERSION }}
+
+      - name: Setup test HA config
+        run: |
+          mkdir -p /tmp/ha_test/config/custom_components
+          ln -s ${{ github.workspace }}/custom_components/dhl_de /tmp/ha_test/config/custom_components/dhl_de
+
+      - name: Run integration tests
+        run: |
+          cd /tmp/ha_test/config
+          python -m pytest ${{ github.workspace }}/tests/integration/ -v
+
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check docs exist
+        run: |
+          if [ -d "docs" ]; then
+            echo "Docs directory exists"
+            ls -la docs/
+          else
+            echo "No docs directory"
+          fi
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

@@ -1,0 +1,83 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Setupart wählen",
+        "description": "Wählen Sie aus, welche Funktion Sie konfigurieren möchten",
+        "data": {
+          "setup_type": "Setupart"
+        }
+      },
+      "package_tracking": {
+        "title": "DHL Paket-Tracking",
+        "description": "DHL Paket Deutschland Tracking über die offizielle API konfigurieren",
+        "data": {
+          "api_key": "API-Schlüssel (Consumer Key)",
+          "environment": "Umgebung",
+          "postal_code": "Empfänger-PLZ (optional)"
+        }
+      },
+      "briefankuendigung": {
+        "title": "Deutsche Post Briefankündigung",
+        "description": "E-Mail-Parsing für Briefankündigungen konfigurieren",
+        "data": {
+          "imap_server": "IMAP-Server",
+          "imap_port": "IMAP-Port",
+          "email": "E-Mail-Adresse",
+          "password": "Passwort / App-Passwort",
+          "mail_folder": "Postfach-Ordner",
+          "mail_senders": "Absender-Adressen (kommagetrennt)",
+          "mail_subjects": "Betreff-Schlüsselwörter (kommagetrennt)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Ungültige Anmeldedaten",
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "unknown": "Unbekannter Fehler",
+      "invalid_api_key": "Ungültiger API-Schlüssel",
+      "rate_limited": "Rate-Limit erreicht, später versuchen"
+    },
+    "abort": {
+      "already_configured": "Bereits konfiguriert",
+      "reauth_successful": "Re-Authentifizierung erfolgreich"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "description": "Integrationsoptionen konfigurieren",
+        "data": {
+          "poll_interval": "Abfrageintervall (Minuten)",
+          "delivered_filter_type": "Zustell-Filter Art",
+          "delivered_filter_value": "Zustell-Filter Wert",
+          "parcel_history": "Paketverlauf aktivieren",
+          "custom_image": "Benutzerdefiniertes 'Keine Post' Bild",
+          "custom_image_file": "Pfad zum benutzerdefinierten Bild"
+        }
+      }
+    }
+  },
+  "selector": {
+    "environment": {
+      "options": {
+        "sandbox": "Sandbox (Kostenlos, kein DHL Konto nötig)",
+        "production": "Produktion (Benötigt DHL Freischaltung)"
+      }
+    },
+    "delivered_filter_type": {
+      "options": {
+        "days": "Für N Tage behalten",
+        "count": "N Neueste behalten"
+      }
+    },
+    "setup_type": {
+      "options": {
+        "package_tracking": "DHL Paket-Tracking (API)",
+        "briefankuendigung": "Briefankündigung (E-Mail/IMAP)",
+        "both": "Beide Funktionen"
+      }
+    }
+  }
+}

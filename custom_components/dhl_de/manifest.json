@@ -1,0 +1,19 @@
+{
+  "domain": "dhl_de",
+  "name": "DHL & Deutsche Post",
+  "version": "1.0.0",
+  "documentation": "https://github.com/huskynarr/hacs-post/wiki",
+  "issue_tracker": "https://github.com/huskynarr/hacs-post/issues",
+  "requirements": [
+    "aiohttp>=3.9.0",
+    "aioimaplib>=1.2.0",
+    "pillow>=10.0.0",
+    "python-dateutil>=2.8.0"
+  ],
+  "config_flow": true,
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": ["@huskynarr"],
+  "integration_type": "hub",
+  "iot_class": "cloud_polling"
+}

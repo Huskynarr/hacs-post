@@ -1,0 +1,35 @@
+---
+name: Documentation
+description: Report documentation issues or request improvements
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees: []
+---
+
+## Documentation Issue
+
+What needs to be improved?
+
+- [ ] Missing documentation
+- [ ] Incorrect/outdated information
+- [ ] Unclear instructions
+- [ ] Translation issues (DE/EN)
+- [ ] Missing examples
+
+## Location
+
+Where is the issue?
+
+- [ ] README.md
+- [ ] Wiki
+- [ ] Inline code comments
+- [ ] Config flow UI strings
+- [ ] Translations (en.json / de.json)
+
+## Suggested Improvement
+
+Describe the changes needed.
+
+## Additional Context
+
+Screenshots, links, or other relevant information.

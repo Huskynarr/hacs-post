@@ -1,0 +1,41 @@
+{
+  "name": "DHL & Deutsche Post",
+  "version": "1.0.0",
+  "description": "Track DHL Paket Deutschland shipments and Deutsche Post Briefankündigungen in Home Assistant",
+  "author": "Huskynarr",
+  "license": "MIT",
+  "repository": "https://github.com/huskynarr/hacs-post",
+  "documentation": "https://github.com/huskynarr/hacs-post/wiki",
+  "issue_tracker": "https://github.com/huskynarr/hacs-post/issues",
+  "homepage": "https://github.com/huskynarr/hacs-post",
+  "categories": [
+    "sensor",
+    "camera",
+    "tracking"
+  ],
+  "requirements": [
+    "aiohttp>=3.9.0",
+    "aioimaplib>=1.2.0",
+    "pillow>=10.0.0",
+    "python-dateutil>=2.8.0"
+  ],
+  "min_ha_version": "2024.7.0",
+  "supported_brands": [
+    "DHL",
+    "Deutsche Post",
+    "Packstation"
+  ],
+  "supported_countries": [
+    "DE"
+  ],
+  "supported_languages": [
+    "en",
+    "de"
+  ],
+  "translation_keys": [
+    "config",
+    "options",
+    "sensor",
+    "camera"
+  ]
+}

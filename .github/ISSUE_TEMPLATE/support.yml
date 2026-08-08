@@ -1,0 +1,31 @@
+---
+name: Support Question
+description: Ask for help with configuration or usage
+title: "[SUPPORT] "
+labels: ["support", "question"]
+assignees: []
+---
+
+## Question
+
+What do you need help with?
+
+## Current Setup
+
+- **Home Assistant Version**:
+- **Integration Version**:
+- **Feature**: [ ] Package Tracking [ ] Briefankündigung [ ] Both
+
+## Configuration (redact sensitive data)
+
+```yaml
+# Paste relevant config
+```
+
+## What Have You Tried?
+
+Steps you've already taken to resolve this.
+
+## Additional Information
+
+Logs, screenshots, or any other relevant details.
